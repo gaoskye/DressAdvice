@@ -3,10 +3,97 @@ import logging
 from sqlalchemy.exc import OperationalError
 
 from wxcloudrun import db
+from wxcloudrun.model import Clothes, ClothesStore
 from wxcloudrun.model import Counters
 
 # 初始化日志
 logger = logging.getLogger('log')
+
+
+def insert_clothes(clothes):
+    """
+    插入一个clothes实体
+    :param clothes: Clothes实体
+    """
+    try:
+        db.session.add(clothes)
+        db.session.commit()
+    except OperationalError as e:
+        logger.error("insert_clothes errorMsg= {} ".format(e))
+
+
+def query_clothes_by_cat(cat):
+    """
+    根据分类查询clothes
+    :param cat: 分类
+    :return: Clothes实体
+    """
+    try:
+        return Clothes.query.filter(Clothes.category == cat).all()
+    except OperationalError as e:
+        logger.error("query_clothes_by_cat errorMsg= {} ".format(e))
+        return None
+
+
+def query_clothes_by_cat_temp(cat, min_temp, max_temp):
+    """
+    根据分类和温度查询clothes
+    :param cat: 分类
+    :param min_temp: 最低温度
+    :param max_temp: 最高温度
+    :return: Clothes实体
+    """
+    if min_temp > max_temp:
+        raise ValueError('min_temp不能大于max_temp')
+    try:
+        return Clothes.query.filter(Clothes.category == cat, Clothes.min_temp <= min_temp,
+                                    Clothes.max_temp >= max_temp).all()
+    except OperationalError as e:
+        logger.error("query_clothes_by_cat_temp errorMsg= {} ".format(e))
+        return None
+
+
+def insert_clothes_store(clothes_store):
+    """
+    插入一个clothes_store实体
+    :param clothes: Clothes实体
+    """
+    try:
+        db.session.add(clothes_store)
+        db.session.commit()
+    except OperationalError as e:
+        logger.error("insert_clothes_store errorMsg= {} ".format(e))
+
+
+def query_clothes_store_by_cat(cat):
+    """
+    根据分类查询clothes_store
+    :param cat: 分类
+    :return: Clothes实体
+    """
+    try:
+        return ClothesStore.query.filter(ClothesStore.category == cat).all()
+    except OperationalError as e:
+        logger.error("query_clothes_store_by_cat errorMsg= {} ".format(e))
+        return None
+
+
+def query_clothes_store_by_cat_temp(cat, min_temp, max_temp):
+    """
+    根据分类和温度查询clothes_store
+    :param cat: 分类
+    :param min_temp: 最低温度
+    :param max_temp: 最高温度
+    :return: Clothes实体
+    """
+    if min_temp > max_temp:
+        raise ValueError('min_temp不能大于max_temp')
+    try:
+        return ClothesStore.query.filter(ClothesStore.category == cat, ClothesStore.min_temp <= min_temp,
+                                         ClothesStore.max_temp >= max_temp).all()
+    except OperationalError as e:
+        logger.error("query_clothes_store_by_cat_temp errorMsg= {} ".format(e))
+        return None
 
 
 def query_counterbyid(id):
