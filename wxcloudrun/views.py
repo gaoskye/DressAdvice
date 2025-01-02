@@ -58,7 +58,18 @@ def add_clothes():
         return make_err_response('image参数必须是字符串')
 
     # 插入衣服数据
-    insert_clothes(params)
+    clothes = Clothes()
+    clothes.name = name
+    clothes.description = description
+    clothes.category = category
+    clothes.min_temp = min_temp
+    clothes.max_temp = max_temp
+    clothes.label = label
+    clothes.image = image
+    clothes.create_time = datetime.now()
+    clothes.update_time = datetime.now()
+
+    insert_clothes(clothes)
 
     return make_succ_response('衣服数据插入成功')
 
