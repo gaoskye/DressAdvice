@@ -10,7 +10,7 @@ from wxcloudrun.model import Counters
 logger = logging.getLogger('log')
 
 
-def insert_clothes(clothes):
+def insert_clothes(clothes:Clothes):
     """
     插入一个clothes实体
     :param clothes: Clothes实体
@@ -53,10 +53,10 @@ def query_clothes_by_cat_temp(cat, min_temp, max_temp):
         return None
 
 
-def insert_clothes_store(clothes_store):
+def insert_clothes_store(clothes_store:ClothesStore):
     """
     插入一个clothes_store实体
-    :param clothes: Clothes实体
+    :param clothes_store: ClothesStore实体
     """
     try:
         db.session.add(clothes_store)
