@@ -5,9 +5,9 @@ from flask import render_template, request
 from flask import send_from_directory, flash, redirect, url_for
 from werkzeug.utils import secure_filename
 
-import dao
+from wxcloudrun.recommend import recommend_clothes
 from run import app
-from wxcloudrun.dao import delete_counterbyid, query_counterbyid, insert_counter, update_counterbyid
+from wxcloudrun.dao import *
 from wxcloudrun.model import Counters
 from wxcloudrun.response import make_succ_empty_response, make_succ_response, make_err_response
 
@@ -58,7 +58,7 @@ def add_clothes():
         return make_err_response('image参数必须是字符串')
 
     # 插入衣服数据
-    dao.insert_clothes(params)
+    insert_clothes(params)
 
     return make_succ_response('衣服数据插入成功')
 
@@ -75,7 +75,7 @@ def query_clothes():
         return make_err_response('缺少cat参数')
 
     if not min_temp and not max_temp:
-        clothes = dao.query_clothes_by_cat(cat)
+        clothes = query_clothes_by_cat(cat)
     elif not min_temp:
         return make_err_response('缺少min_temp参数')
     elif not max_temp:
@@ -91,7 +91,7 @@ def query_clothes():
         if min_temp > max_temp:
             return make_err_response('min_temp不能大于max_temp')
 
-        clothes = dao.query_clothes_by_cat_temp(cat, min_temp, max_temp)
+        clothes = query_clothes_by_cat_temp(cat, min_temp, max_temp)
 
     return make_succ_empty_response() if clothes is None else make_succ_response(clothes)
 
@@ -100,7 +100,8 @@ def query_clothes():
 def recommend_clothes():
     # 从 URL 参数中获取参数
     location = request.args.get('location')
-    return make_succ_empty_response() if location is None else make_succ_response(location)
+    weather_data, suitable_clothes, suitable_clothes_store = recommend_clothes(location)
+    return make_succ_response({'weather': weather_data, 'clothesHave': suitable_clothes, 'clothesBrand': suitable_clothes_store})
 
 
 @app.route('/api/clothes/advice', methods=['GET'])
