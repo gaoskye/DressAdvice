@@ -11,6 +11,9 @@ from wxcloudrun.model import Counters
 from wxcloudrun.recommend import recommend_clothes
 from wxcloudrun.response import success_empty_response, success_response, err_response
 
+@app.before_request
+def before_request():
+    request.environ['CONTENT_TYPE'] = 'application/x-www-form-urlencoded; charset=UTF-8'
 
 @app.route('/api/clothes/add', methods=['POST'])
 def add_clothes():
