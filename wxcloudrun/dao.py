@@ -10,7 +10,7 @@ from wxcloudrun.model import Counters
 logger = logging.getLogger('log')
 
 
-def insert_clothes(clothes:Clothes):
+def insert_clothes(clothes: Clothes):
     """
     插入一个clothes实体
     :param clothes: Clothes实体
@@ -20,24 +20,41 @@ def insert_clothes(clothes:Clothes):
         db.session.commit()
     except OperationalError as e:
         logger.error("insert_clothes errorMsg= {} ".format(e))
+        raise e
 
 
-def query_clothes_by_cat(cat):
+def query_clothes_by_user(user):
     """
     根据分类查询clothes
+    :param user: 用户账号
     :param cat: 分类
     :return: Clothes实体
     """
     try:
-        return Clothes.query.filter(Clothes.category == cat).all()
+        return Clothes.query.filter(Clothes.user == user).all()
     except OperationalError as e:
-        logger.error("query_clothes_by_cat errorMsg= {} ".format(e))
-        return None
+        logger.error("query_clothes_by_user errorMsg= {} ".format(e))
+        raise e
 
 
-def query_clothes_by_cat_temp(cat, min_temp, max_temp):
+def query_clothes_by_user_cat(cat, user):
+    """
+    根据分类查询clothes
+    :param user: 用户账号
+    :param cat: 分类
+    :return: Clothes实体
+    """
+    try:
+        return Clothes.query.filter(Clothes.user == user, Clothes.category == cat).all()
+    except OperationalError as e:
+        logger.error("query_clothes_by_user_cat errorMsg= {} ".format(e))
+        raise e
+
+
+def query_clothes_by_user_cat_temp(cat, min_temp, max_temp, user):
     """
     根据分类和温度查询clothes
+    :param user: 用户账号
     :param cat: 分类
     :param min_temp: 最低温度
     :param max_temp: 最高温度
@@ -46,14 +63,14 @@ def query_clothes_by_cat_temp(cat, min_temp, max_temp):
     if min_temp > max_temp:
         raise ValueError('min_temp不能大于max_temp')
     try:
-        return Clothes.query.filter(Clothes.category == cat, Clothes.min_temp <= min_temp,
+        return Clothes.query.filter(Clothes.user == user, Clothes.category == cat, Clothes.min_temp <= min_temp,
                                     Clothes.max_temp >= max_temp).all()
     except OperationalError as e:
-        logger.error("query_clothes_by_cat_temp errorMsg= {} ".format(e))
-        return None
+        logger.error("query_clothes_by_user_cat_temp errorMsg= {} ".format(e))
+        raise e
 
 
-def insert_clothes_store(clothes_store:ClothesStore):
+def insert_clothes_store(clothes_store: ClothesStore):
     """
     插入一个clothes_store实体
     :param clothes_store: ClothesStore实体
@@ -63,6 +80,7 @@ def insert_clothes_store(clothes_store:ClothesStore):
         db.session.commit()
     except OperationalError as e:
         logger.error("insert_clothes_store errorMsg= {} ".format(e))
+        raise e
 
 
 def query_clothes_store_by_cat(cat):
@@ -75,7 +93,7 @@ def query_clothes_store_by_cat(cat):
         return ClothesStore.query.filter(ClothesStore.category == cat).all()
     except OperationalError as e:
         logger.error("query_clothes_store_by_cat errorMsg= {} ".format(e))
-        return None
+        raise e
 
 
 def query_clothes_store_by_cat_temp(cat, min_temp, max_temp):
@@ -93,7 +111,7 @@ def query_clothes_store_by_cat_temp(cat, min_temp, max_temp):
                                          ClothesStore.max_temp >= max_temp).all()
     except OperationalError as e:
         logger.error("query_clothes_store_by_cat_temp errorMsg= {} ".format(e))
-        return None
+        raise e
 
 
 def query_counterbyid(id):
