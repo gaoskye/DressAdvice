@@ -8,12 +8,12 @@ from wxcloudrun import db
 class Clothes(db.Model):
     __tablename__ = 'clothes'
     __table_args__ = (
-        Index('user_cat_temp', 'user', 'category', 'min_temp', 'max_temp'),
+        Index('user_cat_temp', 'uid', 'category', 'min_temp', 'max_temp'),
     )
 
     id = Column(Integer, primary_key=True, comment='主键')
     name = Column(String(100), nullable=False, default='', comment='衣服名称')
-    user = Column(String(100), nullable=True, default='', comment='用户帐号')
+    uid = Column(String(100), nullable=True, default='', comment='用户帐号')
     description = Column(String(500), nullable=True, default='', comment='衣服描述')
     category = Column(String(50), nullable=True, default='', comment='衣服分类')
     min_temp = Column(Integer, nullable=True, comment='适合最低温度')

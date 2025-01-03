@@ -19,8 +19,8 @@ def add_clothes():
         params = request.get_json()
 
         # 检查参数
-        if 'user' not in params:
-            return err_response('缺少user参数')
+        if 'uid' not in params:
+            return err_response('缺少uid参数')
         if 'clothes' not in params:
             return err_response('缺少clothes参数')
         clothes_param = params['clothes']
@@ -39,7 +39,7 @@ def add_clothes():
         if 'image' not in clothes_param:
             return err_response('缺少image参数')
 
-        user = params['user']
+        uid = params['uid']
         name = clothes_param['name']
         description = clothes_param['description']
         category = clothes_param['category']
@@ -49,8 +49,8 @@ def add_clothes():
         image = clothes_param['image']
 
         # 校验字段类型
-        if not isinstance(user, str):
-            return err_response('user参数必须是字符串')
+        if not isinstance(uid, str):
+            return err_response('uid参数必须是字符串')
         if not isinstance(name, str):
             return err_response('name参数必须是字符串')
         if not isinstance(description, str):
@@ -68,7 +68,7 @@ def add_clothes():
 
         # 插入衣服数据
         clothes = Clothes()
-        clothes.user = user
+        clothes.uid = uid
         clothes.name = name
         clothes.description = description
         clothes.category = category
@@ -90,18 +90,18 @@ def add_clothes():
 def query_clothes():
     try:
         # 从 URL 参数中获取参数
-        user = request.args.get('user')
+        uid = request.args.get('uid')
         cat = request.args.get('cat')
         min_temp = request.args.get('min_temp')
         max_temp = request.args.get('max_temp')
 
-        if not user:
-            return err_response('缺少user参数')
+        if not uid:
+            return err_response('缺少uid参数')
 
         if not cat and not min_temp and not max_temp:
-            clothes = query_clothes_by_user(user)
+            clothes = query_clothes_by_user(uid)
         elif cat and not min_temp and not max_temp:
-            clothes = query_clothes_by_user_cat(cat, user)
+            clothes = query_clothes_by_user_cat(cat, uid)
         elif not cat:
             return err_response('缺少cat参数')
         elif not min_temp:
@@ -119,7 +119,7 @@ def query_clothes():
             if min_temp > max_temp:
                 return err_response('min_temp不能大于max_temp')
 
-            clothes = query_clothes_by_user_cat_temp(cat, min_temp, max_temp, user)
+            clothes = query_clothes_by_user_cat_temp(cat, min_temp, max_temp, uid)
 
         return success_empty_response() if clothes is None else success_response(clothes)
 
@@ -133,9 +133,9 @@ def recommend():
     try:
         # 从 URL 参数中获取参数
         city = request.args.get('city')
-        user = request.args.get('user')
-        logger.info("recommend_clothes, city:{}, user:{}".format(city, user))
-        weather_data, suitable_clothes, suitable_clothes_store = recommend_clothes(city, user)
+        uid = request.args.get('uid')
+        logger.info("recommend_clothes, city:{}, uid:{}".format(city, uid))
+        weather_data, suitable_clothes, suitable_clothes_store = recommend_clothes(city, uid)
         return success_response(
             {'weather': weather_data, 'clothesHave': suitable_clothes, 'clothesBrand': suitable_clothes_store})
     except Exception as e:
@@ -148,6 +148,7 @@ def get_clothes_advice():
     try:
         # 从 URL 参数中获取参数
         location = request.args.get('location')
+        uid = request.args.get('uid')
         return success_empty_response() if location is None else success_response(location)
     except Exception as e:
         logger.error("get_clothes_advice error", e)
@@ -170,8 +171,7 @@ def upload_clothes_image():
             flash('No file part')
             return redirect(request.url)
         file = request.files['file']
-        # If the user does not select a file, the browser submits an
-        # empty file without a filename.
+        # If does not select a file, the browser submits an empty file without a filename.
         if file.filename == '':
             flash('No selected file')
             return redirect(request.url)

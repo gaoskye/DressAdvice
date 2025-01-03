@@ -31,7 +31,7 @@ def query_clothes_by_user(user):
     :return: Clothes实体
     """
     try:
-        return Clothes.query.filter(Clothes.user == user).all()
+        return Clothes.query.filter(Clothes.uid == user).all()
     except OperationalError as e:
         logger.error("query_clothes_by_user errorMsg= {} ".format(e))
         raise e
@@ -45,7 +45,7 @@ def query_clothes_by_user_cat(cat, user):
     :return: Clothes实体
     """
     try:
-        return Clothes.query.filter(Clothes.user == user, Clothes.category == cat).all()
+        return Clothes.query.filter(Clothes.uid == user, Clothes.category == cat).all()
     except OperationalError as e:
         logger.error("query_clothes_by_user_cat errorMsg= {} ".format(e))
         raise e
@@ -63,7 +63,7 @@ def query_clothes_by_user_cat_temp(cat, min_temp, max_temp, user):
     if min_temp > max_temp:
         raise ValueError('min_temp不能大于max_temp')
     try:
-        return Clothes.query.filter(Clothes.user == user, Clothes.category == cat, Clothes.min_temp <= min_temp,
+        return Clothes.query.filter(Clothes.uid == user, Clothes.category == cat, Clothes.min_temp <= min_temp,
                                     Clothes.max_temp >= max_temp).all()
     except OperationalError as e:
         logger.error("query_clothes_by_user_cat_temp errorMsg= {} ".format(e))
