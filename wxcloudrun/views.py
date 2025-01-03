@@ -11,6 +11,7 @@ from wxcloudrun.model import Counters
 from wxcloudrun.recommend import recommend_clothes
 from wxcloudrun.response import success_empty_response, success_response, err_response
 
+from wxcloudrun.common import ClothingCategory
 
 @app.route('/api/clothes/add', methods=['POST'])
 def add_clothes():
@@ -65,6 +66,10 @@ def add_clothes():
             return err_response('label参数必须是字符串')
         if not isinstance(image, str):
             return err_response('image参数必须是字符串')
+
+        clothes_category = set([member.name for member in ClothingCategory])
+        if not category in clothes_category:
+            return err_response('category参数范围：{}'.format(clothes_category))
 
         # 插入衣服数据
         clothes = Clothes()
