@@ -1,15 +1,15 @@
+import logging
 import random
 
 from wxcloudrun.common import SourceType, ClothingCategory
 from wxcloudrun.dao import query_clothes_by_user_cat_temp, query_clothes_store_by_cat_temp
 from wxcloudrun.weather import get_weather
-import logging
 
 logger = logging.getLogger('log')
 
+
 def recommend_clothes(city, user):
     weather_data = get_weather(city)
-    logger.info("recommend_clothes, weather_data:{}".format(weather_data))
     suitable_clothes = get_suitable_clothes(weather_data, SourceType.USER_CLOTHES, user)
     suitable_clothes_brand = get_suitable_clothes(weather_data, SourceType.CLOTHES_STORE, user)
     return weather_data, suitable_clothes, suitable_clothes_brand
@@ -44,22 +44,26 @@ def select_by_temp(weather_data, source_type: SourceType, user):
 
     if temperature_min > 23:
         # 规则1：当天气最低温度>23度，推荐的产品组合为内搭+下装
-        inner_clothes = query_clothes(ClothingCategory.tops, (avg_temperature - 2), (avg_temperature + 2), source_type,
+        inner_clothes = query_clothes(ClothingCategory.tops.name, (avg_temperature - 2), (avg_temperature + 2),
+                                      source_type,
                                       user)
-        bottom_clothes = query_clothes(ClothingCategory.bottoms, (avg_temperature - 2), (avg_temperature + 2),
+        bottom_clothes = query_clothes(ClothingCategory.bottoms.name, (avg_temperature - 2), (avg_temperature + 2),
                                        source_type, user)
     elif 10 < temperature_min <= 23:
         # 规则2：当10度<天气最低温度<23度，推荐的产品组合外套+内搭+下装
-        outer_clothes = query_clothes(ClothingCategory.outerwear, (temperature_min - 2), (temperature_min - 2),
+        outer_clothes = query_clothes(ClothingCategory.outerwear.name, (temperature_min - 2), (temperature_min - 2),
                                       source_type, user)
-        inner_clothes = query_clothes(ClothingCategory.tops, (avg_temperature - 2), (avg_temperature + 2), source_type)
-        bottom_clothes = query_clothes(ClothingCategory.bottoms, (avg_temperature - 2), (avg_temperature + 2),
+        inner_clothes = query_clothes(ClothingCategory.tops.name, (avg_temperature - 2), (avg_temperature + 2),
+                                      source_type)
+        bottom_clothes = query_clothes(ClothingCategory.bottoms.name, (avg_temperature - 2), (avg_temperature + 2),
                                        source_type, user)
     elif temperature_min <= 10:
         # 规则3：当天气温度<10度，推荐的产品组合为外套+内搭+下装
-        outer_clothes = query_clothes(ClothingCategory.outerwear, temperature_min, temperature_min, source_type, user)
-        inner_clothes = query_clothes(ClothingCategory.tops, temperature_min, temperature_min, source_type, user)
-        bottom_clothes = query_clothes(ClothingCategory.bottoms, temperature_min, temperature_min, source_type, user)
+        outer_clothes = query_clothes(ClothingCategory.outerwear.name, temperature_min, temperature_min, source_type,
+                                      user)
+        inner_clothes = query_clothes(ClothingCategory.tops.name, temperature_min, temperature_min, source_type, user)
+        bottom_clothes = query_clothes(ClothingCategory.bottoms.name, temperature_min, temperature_min, source_type,
+                                       user)
 
     return inner_clothes, outer_clothes, bottom_clothes
 
@@ -83,11 +87,11 @@ def filter_by_label(weather_data, clothes_list):
     return filter_clothes if filter_clothes else clothes_list
 
 
-def query_clothes(category, min_temp, max_temp, type: SourceType, user):
+def query_clothes(category, min_temp, max_temp, source_type: SourceType, user):
     clothes = []
-    if type == SourceType.USER_CLOTHES:
+    if source_type == SourceType.USER_CLOTHES:
         clothes.extend(query_clothes_by_user_cat_temp(category, min_temp, max_temp, user))
-    elif type == SourceType.CLOTHES_STORE:
+    elif source_type == SourceType.CLOTHES_STORE:
         clothes.extend(query_clothes_store_by_cat_temp(category, min_temp, max_temp))
     return clothes
 
