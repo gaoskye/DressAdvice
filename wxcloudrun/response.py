@@ -15,5 +15,5 @@ def success_response(data):
 
 
 def err_response(err_msg):
-    data = json.dumps({'code': -1, 'errorMsg': err_msg})
+    data = json.dumps({'code': -1, 'errorMsg': err_msg}, ensure_ascii=False)
     return Response(data, mimetype='application/json')
