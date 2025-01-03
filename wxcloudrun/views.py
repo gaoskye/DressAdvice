@@ -11,9 +11,6 @@ from wxcloudrun.model import Counters
 from wxcloudrun.recommend import recommend_clothes
 from wxcloudrun.response import success_empty_response, success_response, err_response
 
-@app.before_request
-def before_request():
-    request.environ['CONTENT_TYPE'] = 'application/x-www-form-urlencoded; charset=UTF-8'
 
 @app.route('/api/clothes/add', methods=['POST'])
 def add_clothes():
@@ -85,7 +82,7 @@ def add_clothes():
         return success_response('衣服数据插入成功')
 
     except Exception as e:
-        logger.error("insert_clothes errorMsg= {} ".format(e))
+        logger.error("insert_clothes error", e)
         return err_response(format(e))
 
 
@@ -127,7 +124,7 @@ def query_clothes():
         return success_empty_response() if clothes is None else success_response(clothes)
 
     except Exception as e:
-        logger.error("query_clothes errorMsg= {} ".format(e))
+        logger.error("query_clothes error", e)
         return err_response(format(e))
 
 
@@ -137,11 +134,12 @@ def recommend():
         # 从 URL 参数中获取参数
         city = request.args.get('city')
         user = request.args.get('user')
+        logger.info("recommend_clothes, city:{}, user:{}".format(city, user))
         weather_data, suitable_clothes, suitable_clothes_store = recommend_clothes(city, user)
         return success_response(
             {'weather': weather_data, 'clothesHave': suitable_clothes, 'clothesBrand': suitable_clothes_store})
     except Exception as e:
-        logger.error("recommend_clothes errorMsg= {} ".format(e))
+        logger.error("recommend_clothes error", e)
         return err_response(format(e))
 
 
@@ -152,7 +150,7 @@ def get_clothes_advice():
         location = request.args.get('location')
         return success_empty_response() if location is None else success_response(location)
     except Exception as e:
-        logger.error("get_clothes_advice errorMsg= {} ".format(e))
+        logger.error("get_clothes_advice error", e)
         return err_response(format(e))
 
 

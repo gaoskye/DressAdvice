@@ -3,10 +3,13 @@ import random
 from wxcloudrun.common import SourceType, ClothingCategory
 from wxcloudrun.dao import query_clothes_by_user_cat_temp, query_clothes_store_by_cat_temp
 from wxcloudrun.weather import get_weather
+import logging
 
+logger = logging.getLogger('log')
 
 def recommend_clothes(city, user):
     weather_data = get_weather(city)
+    logger.info("recommend_clothes, weather_data:{}".format(weather_data))
     suitable_clothes = get_suitable_clothes(weather_data, SourceType.USER_CLOTHES, user)
     suitable_clothes_brand = get_suitable_clothes(weather_data, SourceType.CLOTHES_STORE, user)
     return weather_data, suitable_clothes, suitable_clothes_brand

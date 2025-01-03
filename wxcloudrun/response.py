@@ -1,20 +1,8 @@
 import json
-from datetime import datetime
 
 from flask import Response
+from objtyping import to_primitive
 
-class MyEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, datetime):
-            return obj.strftime("%Y-%m-%d %H:%M:%S")
-        if isinstance(obj, bytes):
-            return str(obj, encoding='utf-8')
-        if isinstance(obj, int):
-            return int(obj)
-        elif isinstance(obj, float):
-            return float(obj)
-        else:
-            return super(MyEncoder, self).default(obj)
 
 def success_empty_response():
     data = json.dumps({'code': 0, 'data': {}})
@@ -22,7 +10,7 @@ def success_empty_response():
 
 
 def success_response(data):
-    data = json.dumps({'code': 0, 'data': data}, cls=MyEncoder)
+    data = json.dumps(to_primitive({'code': 0, 'data': data}), ensure_ascii=False)
     return Response(data, mimetype='application/json')
 
 
